@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kegelkasse</title>
+<meta name="theme-color" content="#17382B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kegelkasse">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F0;--surface:#FFFFFF;--ink:#14211A;--muted:#5A6960;--line:#D6DDD5;
+  --green:#17382B;--green-2:#21483A;--on-green:#EAF2EC;--on-green-muted:#A9C2B3;
+  --brass:#9C711B;--brass-soft:#F4EAD3;--red:#B42318;--red-soft:#FBE8E5;--ok:#2B7246;--ok-soft:#E2F0E6;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1712;--surface:#15231C;--ink:#E5ECE7;--muted:#98A89F;--line:#283A30;
+    --green:#0A1C14;--green-2:#13291F;--on-green:#E5ECE7;--on-green-muted:#8FA699;
+    --brass:#DDAE52;--brass-soft:#382D15;--red:#F2786C;--red-soft:#3A1C19;--ok:#6EC48D;--ok-soft:#163022;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1712;--surface:#15231C;--ink:#E5ECE7;--muted:#98A89F;--line:#283A30;
+  --green:#0A1C14;--green-2:#13291F;--on-green:#E5ECE7;--on-green-muted:#8FA699;
+  --brass:#DDAE52;--brass-soft:#382D15;--red:#F2786C;--red-soft:#3A1C19;--ok:#6EC48D;--ok-soft:#163022;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.cond{font-family:"Barlow Condensed","Arial Narrow",Barlow,system-ui,sans-serif}
+.num{font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+
+/* Header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--green);color:var(--on-green)}
+.hwrap{max-width:1040px;margin:0 auto;padding:12px 16px 0}
+.hrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand h1{margin:0;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:1.75rem;letter-spacing:.01em;line-height:1}
+.pins{display:grid;grid-template-columns:repeat(4,6px);gap:2px;justify-items:center;align-items:end}
+.pins i{width:6px;height:6px;border-radius:50%;background:var(--on-green)}
+.pins i.d{background:transparent}
+.status{font-size:.8rem;color:var(--on-green-muted)}
+.status.err{color:#FFB4A8}
+.abendsel{display:flex;gap:8px;align-items:center}
+.abendsel select{background:var(--green-2);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 10px;color:var(--on-green);max-width:56vw}
+.hbtn{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--on-green);border-radius:8px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.hbtn:hover{background:var(--green-2)}
+nav{display:flex;gap:2px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:none;border:0;color:var(--on-green-muted);padding:10px 14px 12px;cursor:pointer;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:1.1rem;font-weight:600;border-bottom:3px solid transparent}
+nav button[aria-current="true"]{color:var(--on-green);border-bottom-color:var(--brass)}
+
+main{max-width:1040px;margin:0 auto;padding:18px 16px 48px}
+h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:1.5rem;margin:0 0 4px;line-height:1.1}
+h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:1.2rem;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.95rem}
+section{margin-bottom:28px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.chip[aria-pressed="false"]{color:var(--muted);text-decoration:line-through}
+
+/* player grid */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.pbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:64px}
+.pbtn .n{font-weight:600;font-size:1.05rem}
+.pbtn .v{color:var(--muted);font-size:.9rem}
+.pbtn[aria-pressed="true"]{border:2px solid var(--brass);background:var(--brass-soft);padding:9px 11px}
+.crown{color:var(--brass);font-weight:700}
+
+/* counters */
+.counter-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:18px 0 10px}
+.counter-head .who{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:2rem;font-weight:700;line-height:1}
+.counter-head .tot{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:1.6rem;font-weight:600;color:var(--red)}
+.counters{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.ctr{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 14px}
+.ctr .l{font-weight:600;line-height:1.2}
+.ctr .r{display:block;color:var(--muted);font-weight:400;font-size:.85rem}
+.ctr .r.warn{color:var(--red)}
+.ctr .c{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:1.8rem;font-weight:700;min-width:2ch;text-align:center}
+.minus,.plus{border:0;border-radius:8px;cursor:pointer;width:44px;height:44px;font-size:1.4rem;line-height:1}
+.minus{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.plus{background:var(--green);color:var(--on-green);width:56px}
+.plus:active{transform:scale(.96)}
+.ctr.money{grid-template-columns:1fr auto}
+.ctr.money input{width:110px}
+
+/* tables */
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.85rem;background:var(--surface)}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tfoot td{font-weight:600;border-top:2px solid var(--line);border-bottom:0}
+tr.lead td{background:var(--brass-soft)}
+tr.lead td:first-child{background:var(--brass-soft)}
+tr.absent td{color:var(--muted)}
+.inp{width:64px;padding:6px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:right}
+.inp.w{width:96px}
+td.total{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:1.25rem;font-weight:700}
+.pos{color:var(--red);font-weight:600}
+.zero{color:var(--ok)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.primary{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.btn.small{padding:5px 10px;font-size:.9rem}
+.btn.danger{color:var(--red);border-color:var(--red)}
+.btn:disabled{opacity:.45;cursor:default}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+.field input,.field select,.field textarea{color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:1rem}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.paid{color:var(--ok);font-weight:600}
+.acts{display:flex;gap:6px}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--brass-soft);border:1px solid var(--brass);border-radius:12px;padding:12px 14px;margin-bottom:20px}
+.btn.wa{background:#1F8F4E;border-color:#1F8F4E;color:#fff}
+
+/* Kasse */
+.kasse{display:flex;flex-wrap:wrap;gap:24px 40px;align-items:flex-end}
+.kasse .big{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:clamp(3rem,12vw,5rem);line-height:.9}
+.kasse .lbl{color:var(--muted);font-size:.95rem}
+.kasse .mid{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:1.8rem;line-height:1}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font-size:1.15rem;margin-bottom:6px}
+details{margin-top:24px}
+summary{cursor:pointer;font-weight:600}
+.rules{white-space:pre-wrap;color:var(--muted);margin:10px 0 0}
+.katalog{display:grid;grid-template-columns:1fr auto;gap:4px 24px;max-width:420px;margin-top:10px}
+.katalog span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.mrow{display:flex;gap:8px;align-items:center}
+.mrow input[type=text]{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.mrow.inactive input[type=text]{color:var(--muted);text-decoration:line-through}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.note{font-size:.88rem;color:var(--muted);margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:560px){
+  .brand h1{font-size:1.5rem}
+  .hbtn{padding:7px 10px}
+  .counters{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="hrow">
+      <div class="brand">
+        <div class="pins" aria-hidden="true"><i class="d"></i><i></i><i></i><i class="d"></i><i></i><i></i><i></i><i></i></div>
+        <h1>Kegelkasse</h1>
+      </div>
+      <div class="abendsel" id="abendsel"></div>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+    <nav id="nav" aria-label="Bereiche"></nav>
+  </div>
+</header>
+<main id="app"><p class="empty">Lädt…</p></main>
+
+<script>
+const GAMES = 6; // Startwert pro Abend
+const MAX_GAMES = 30;
+function nGames(a){ const n = parseInt(a && a.spiele, 10); return n > 0 ? Math.min(n, MAX_GAMES) : GAMES; }
+const RATE_DEFS = [
+  ['beitrag','Monatsbeitrag (pro Person)',10],
+  ['pumpe','Pumpe',0.5],
+  ['klingel','Klingel',1],
+  ['koenig','Pumpenkönig',5],
+  ['tacken','Tacken',0.5],
+  ['lustwurf','Lustwurf',1],
+  ['bahn','Mit Kugel Bahn verlassen',1],
+  ['pokal','Pokal vergessen',5]
+];
+const COUNTERS = [
+  ['pumpen','Pumpe','pumpe'],
+  ['klingeln','Klingel','klingel'],
+  ['tacken','Tacken','tacken'],
+  ['lustwurf','Lustwurf','lustwurf'],
+  ['bahn','Mit Kugel Bahn verlassen','bahn'],
+  ['schnaps','Kugel am Tisch → Schnapsrunde',null],
+  ['pokal','Pokal vergessen','pokal']
+];
+const TABS = [['spiel','Spiel'],['strafen','Strafen'],['abrechnung','Abrechnung'],['kasse','Kasse'],['einstellungen','Einstellungen']];
+const DEFAULT_RULES = "Fester Termin: jeden 2. Freitag im Monat\nAlle Strafen gehen in die Kasse\n10 € Monatsbeitrag pro Person\nKugel am Tisch: eine Runde Schnaps\nIm Zweifel immer für die Kasse";
+const LS_KEY = 'kegelkasse-v1';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : 0; };
+const eur = n => (Math.round(n*100)/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fmtDate = id => { const d = new Date(id+'T12:00:00'); return isNaN(d) ? id : d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}); };
+function secondFriday(y,m){ const d = new Date(y,m,1); const off = (5 - d.getDay() + 7) % 7; return new Date(y,m,1+off+7); }
+function uid(){ return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+let db = null, mode = 'loading';
+const BK_KEY = 'kegelkasse-letzte-sicherung';
+const S = { config:null, abende:{}, cur:null, tab:'strafen', sel:null, showNew:false, loadedC:false, loadedA:false };
+const dirty = {}, timers = {};
+let pendingRender = false;
+
+/* ---------- Daten-Helfer ---------- */
+function blankP(present){ return { present:!!present, games:Array(GAMES).fill(''), pumpen:0, klingeln:0, tacken:0, lustwurf:0, bahn:0, schnaps:0, pokal:0, sonst:0, beitrag:true, bezahlt:0 }; }
+function members(){ return S.config?.members || []; }
+function memberName(id){ return members().find(m=>m.id===id)?.name || 'Ehemaliges Mitglied'; }
+function rates(){ const r = {}; RATE_DEFS.forEach(([k,,d]) => r[k] = num(S.config?.rates?.[k] ?? d)); return r; }
+function cur(){ return S.abende[S.cur]; }
+function P(a,id){
+  if(!a.p) a.p = {};
+  if(!a.p[id]) a.p[id] = blankP(false);
+  const p = a.p[id];
+  if(!Array.isArray(p.games)) p.games = [];
+  const n = nGames(a);
+  while(p.games.length < n) p.games.push('');
+  if(p.games.length > n) p.games.length = n;
+  return p;
+}
+function abendMembers(a){
+  const ids = new Set(Object.keys(a.p || {}));
+  const list = members().filter(m => ids.has(m.id) || m.active !== false).map(m => m.id);
+  ids.forEach(id => { if(!list.includes(id)) list.push(id); });
+  return list;
+}
+function present(a){ return abendMembers(a).filter(id => a.p?.[id]?.present); }
+function kings(a){
+  if(a.koenig === 'none') return [];
+  if(a.koenig && a.koenig !== 'auto') return [a.koenig];
+  let max = 0; const pr = present(a);
+  pr.forEach(id => max = Math.max(max, a.p[id].pumpen || 0));
+  if(max <= 0) return [];
+  return pr.filter(id => (a.p[id].pumpen || 0) === max);
+}
+function calc(a,id){
+  const r = rates(); const p = a.p?.[id] || blankP(false);
+  const isK = kings(a).includes(id);
+  const strafen = COUNTERS.reduce((s,[k,,rk]) => s + (p[k]||0)*(r[rk]||0), 0) + (isK ? r.koenig : 0) + num(p.sonst);
+  const beitrag = p.beitrag !== false ? r.beitrag : 0;
+  const gesamt = beitrag + strafen, bezahlt = num(p.bezahlt);
+  const punkte = (p.games||[]).reduce((s,g) => s + num(g), 0);
+  return { beitrag, strafen, gesamt, bezahlt, offen: Math.round((gesamt - bezahlt)*100)/100, isK, punkte };
+}
+function abendSum(a){
+  const ids = abendMembers(a); let soll = 0, ist = 0, strafen = 0;
+  ids.forEach(id => { const c = calc(a,id); soll += c.gesamt; ist += c.bezahlt; strafen += c.strafen; });
+  return { soll, ist, strafen, offen: soll - ist, bahn: num(a.bahn) };
+}
+function sortedIds(){ return Object.keys(S.abende).sort().reverse(); }
+
+/* ---------- Speichern ---------- */
+function setStatus(kind, msg){
+  const el = $('#status');
+  const where = mode === 'db' ? 'Gespeichert für alle mit Zugriff' : mode === 'local' ? 'Offline-Version: gespeichert auf diesem Handy' : '';
+  if(kind === 'saving'){ el.className = 'status'; el.textContent = 'Speichert…'; }
+  else if(kind === 'err'){ el.className = 'status err'; el.textContent = msg || 'Speichern fehlgeschlagen. Bitte erneut versuchen.'; }
+  else { el.className = 'status'; el.textContent = where; }
+}
+function errMsg(e){
+  const c = e && e.code;
+  if(c === 'not_granted' || c === 'revoked') return 'Nur Lesezugriff: Änderungen werden nicht gespeichert.';
+  if(c === 'quota_exceeded' || c === 'resource_exhausted') return 'Speicher ist voll oder ausgelastet. Später erneut versuchen.';
+  return 'Speichern fehlgeschlagen. Verbindung prüfen.';
+}
+function localSave(){ localStorage.setItem(LS_KEY, JSON.stringify({config:S.config, abende:S.abende})); try{ localStorage.setItem('kegelkasse-letzte-aenderung', new Date().toISOString()); }catch(e){} }
+function saveAbend(id){
+  dirty['a:'+id] = Date.now(); setStatus('saving');
+  clearTimeout(timers['a:'+id]);
+  timers['a:'+id] = setTimeout(async () => {
+    const a = S.abende[id]; if(!a) return;
+    try{
+      if(db) await db.doc('abende/'+id).set(JSON.parse(JSON.stringify(a)));
+      else localSave();
+      setStatus('ok');
+    }catch(e){ setStatus('err', errMsg(e)); }
+    dirty['a:'+id] = Date.now();
+  }, 450);
+}
+function saveConfig(){
+  dirty.config = Date.now(); setStatus('saving');
+  clearTimeout(timers.config);
+  timers.config = setTimeout(async () => {
+    try{
+      if(db) await db.doc('club/config').set(JSON.parse(JSON.stringify(S.config)));
+      else localSave();
+      setStatus('ok');
+    }catch(e){ setStatus('err', errMsg(e)); }
+    dirty.config = Date.now();
+  }, 450);
+}
+async function deleteAbend(id){
+  delete S.abende[id]; dirty['a:'+id] = Date.now();
+  try{ if(db) await db.doc('abende/'+id).delete(); else localSave(); setStatus('ok'); }
+  catch(e){ setStatus('err', errMsg(e)); }
+}
+function recent(key){ return Date.now() - (dirty[key] || 0) < 2500; }
+
+function scheduleRender(){
+  const f = document.activeElement;
+  if(f && $('#app').contains(f) && /INPUT|TEXTAREA/.test(f.tagName)){ pendingRender = true; return; }
+  render();
+}
+document.addEventListener('focusout', () => setTimeout(() => { if(pendingRender){ pendingRender = false; scheduleRender(); } }, 0));
+
+/* ---------- Rendering ---------- */
+function ensureCur(){
+  if(!S.cur || !S.abende[S.cur]) S.cur = sortedIds()[0] || null;
+}
+function renderHeader(){
+  const ids = sortedIds();
+  $('#abendsel').innerHTML = ids.length
+    ? `<label class="sr" style="position:absolute;left:-9999px" for="abendSelect">Kegelabend</label>
+       <select id="abendSelect" data-f="abend">${ids.map(id => `<option value="${id}" ${id===S.cur?'selected':''}>${esc(fmtDate(id))}</option>`).join('')}</select>
+       <button class="hbtn" data-act="new">Neuer Abend</button>`
+    : (S.config ? `<button class="hbtn" data-act="new">Neuer Abend</button>` : '');
+  $('#nav').innerHTML = TABS.map(([k,l]) => `<button data-act="tab" data-v="${k}" aria-current="${S.tab===k}">${l}</button>`).join('');
+}
+function newAbendForm(){
+  const now = new Date(); let d = secondFriday(now.getFullYear(), now.getMonth());
+  if(S.abende[iso(d)]) d = now;
+  return `<section class="panel" id="newForm">
+    <h3>Neuen Kegelabend anlegen</h3>
+    <div class="row">
+      <label class="field">Datum<input type="date" id="newDate" value="${iso(d)}"></label>
+      <button class="btn primary" data-act="create">Abend anlegen</button>
+      ${sortedIds().length ? `<button class="btn" data-act="cancelNew">Abbrechen</button>` : ''}
+    </div>
+    <p class="note">Alle aktiven Mitglieder werden als anwesend eingetragen. Wer fehlt, kann im Bereich „Spiel“ abgewählt werden. Der Monatsbeitrag gilt für alle.</p>
+  </section>`;
+}
+function render(){
+  ensureCur(); renderHeader();
+  const app = $('#app');
+  if(mode === 'loading' || (mode === 'db' && (!S.loadedC || !S.loadedA))){ app.innerHTML = '<p class="empty">Lädt…</p>'; return; }
+  if(!S.config){
+    app.innerHTML = `<div class="panel empty"><strong>Noch keine Vereinsdaten</strong>Lege die Mitglieder und Strafsätze an, um loszulegen.<br><br><button class="btn primary" data-act="initConfig">Einrichtung starten</button></div>`;
+    return;
+  }
+  if(S.tab === 'einstellungen'){ app.innerHTML = viewSettings(); return; }
+  if(S.tab === 'kasse'){ app.innerHTML = (S.showNew ? newAbendForm() : '') + viewKasse(); return; }
+  if(!cur() || S.showNew){ app.innerHTML = newAbendForm() + (cur() ? '' : `<div class="empty"><strong>Noch kein Kegelabend erfasst</strong>Lege oben den ersten Abend an.</div>`); if(!cur()) return; }
+  else app.innerHTML = '';
+  const html = S.tab === 'spiel' ? viewSpiel() : S.tab === 'strafen' ? viewStrafen() : viewAbrechnung();
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+function viewSpiel(){
+  const a = cur(); const ids = abendMembers(a); const pr = present(a);
+  const totals = pr.map(id => calc(a,id).punkte); const best = Math.max(0, ...totals);
+  const rows = pr.map(id => {
+    const p = P(a,id); const c = calc(a,id);
+    return `<tr class="${c.punkte===best && best>0 ? 'lead':''}"><td>${esc(memberName(id))}${c.punkte===best && best>0 ? ' <span class="crown" title="Bestes Ergebnis">★</span>':''}</td>
+      ${p.games.map((g,i) => `<td><input class="inp num" inputmode="numeric" aria-label="${esc(memberName(id))} Spiel ${i+1}" data-f="game" data-id="${id}" data-i="${i}" value="${esc(g)}"></td>`).join('')}
+      <td class="total num" data-out="pts:${id}">${c.punkte}</td></tr>`;
+  }).join('');
+  return `<section>
+    <h2>Anwesenheit</h2><p class="sub">Antippen, wer heute dabei ist.</p>
+    <div class="chips">${ids.map(id => `<button class="chip" data-act="present" data-id="${id}" aria-pressed="${!!a.p?.[id]?.present}">${esc(memberName(id))}</button>`).join('')}</div>
+  </section>
+  <section>
+    <h2>Punkte</h2><p class="sub">Holz pro Spiel eintragen. Die Gesamtsumme rechnet sich selbst.</p>
+    ${pr.length ? `<div class="tscroll"><table><thead><tr><th>Name</th>${Array.from({length:nGames(a)},(_,i)=>`<th>Spiel ${i+1}</th>`).join('')}<th>Gesamt</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" data-act="addGame" ${nGames(a)>=MAX_GAMES?'disabled':''}>+ Spiel hinzufügen</button><button class="btn" data-act="removeGame" ${nGames(a)<=1?'disabled':''}>Letztes Spiel entfernen</button><span class="note" style="margin:0">${nGames(a)} Spiele an diesem Abend</span></div>`
+      : `<div class="panel empty">Niemand als anwesend markiert.</div>`}
+  </section>`;
+}
+
+function viewStrafen(){
+  const a = cur(); const pr = present(a); const r = rates(); const K = kings(a);
+  if(!pr.length) return `<div class="panel empty"><strong>Niemand anwesend</strong>Im Bereich „Spiel“ die Anwesenheit setzen.</div>`;
+  if(!S.sel || !pr.includes(S.sel)) S.sel = pr[0];
+  const grid = pr.map(id => { const c = calc(a,id);
+    return `<button class="pbtn" data-act="sel" data-id="${id}" aria-pressed="${id===S.sel}"><span class="n">${esc(memberName(id))}${K.includes(id)?' <span class="crown" title="Pumpenkönig">♛</span>':''}</span><span class="v num">${eur(c.strafen)} Strafen</span></button>`; }).join('');
+  const p = P(a,S.sel); const c = calc(a,S.sel);
+  const ctrs = COUNTERS.map(([k,l,rk]) => `<div class="ctr">
+      <span class="l">${esc(l)}${rk===null ? '<span class="r">Wird nur gezählt, kein Geld</span>' : `<span class="r ${r[rk]?'':'warn'}">${r[rk] ? eur(r[rk]) : 'Betrag in Einstellungen festlegen'}</span>`}</span>
+      <button class="minus" data-act="inc" data-k="${k}" data-d="-1" aria-label="${esc(l)} minus eins" ${p[k]>0?'':'disabled'}>−</button>
+      <span class="c num" aria-live="polite">${p[k]||0}</span>
+      <button class="plus" data-act="inc" data-k="${k}" data-d="1" aria-label="${esc(l)} plus eins">+</button>
+    </div>`).join('');
+  const overview = pr.map(id => { const q = P(a,id); const cc = calc(a,id);
+    return `<tr><td>${esc(memberName(id))}${cc.isK?' <span class="crown">♛</span>':''}</td>${COUNTERS.map(([k]) => `<td class="num">${q[k]||''}</td>`).join('')}<td class="num">${num(q.sonst)?eur(num(q.sonst)):''}</td><td class="num"><strong>${eur(cc.strafen)}</strong></td></tr>`; }).join('');
+  const sum = abendSum(a);
+  return `<section>
+    <h2>Wer hat's verbockt?</h2><p class="sub">Person wählen, dann Strafe antippen.</p>
+    <div class="pgrid">${grid}</div>
+    <div class="counter-head"><span class="who">${esc(memberName(S.sel))}${c.isK?' <span class="crown" title="Pumpenkönig">♛</span>':''}</span><span class="tot num" data-out="str:${S.sel}">${eur(c.strafen)}</span></div>
+    <div class="counters">${ctrs}
+      <div class="ctr money"><span class="l">Sonstiges (€)<span class="r">Freier Betrag, z. B. Sonderstrafe</span></span>
+      <input class="inp w num" inputmode="decimal" data-f="sonst" data-id="${S.sel}" value="${num(p.sonst)||''}" aria-label="Sonstiges in Euro"></div>
+    </div>
+    <p class="note">Pumpenkönig (${eur(r.koenig)}): ${K.length ? K.map(id=>esc(memberName(id))).join(', ') : 'noch niemand'} – wird automatisch an die meisten Pumpen vergeben, bei Gleichstand an alle. Ändern unter „Abrechnung“.</p>
+  </section>
+  <section>
+    <h2>Übersicht des Abends</h2><p class="sub">Strafen gesamt: <strong class="num">${eur(sum.strafen)}</strong></p>
+    <div class="tscroll"><table><thead><tr><th>Name</th>${COUNTERS.map(([k,l]) => `<th>${esc(k==='schnaps' ? 'Schnapsrunden' : l.split(' →')[0])}</th>`).join('')}<th>Sonst.</th><th>Strafen</th></tr></thead><tbody>${overview}</tbody></table></div>
+  </section>
+  <details class="panel"><summary>Strafenkatalog und Regeln</summary>
+    <div class="katalog">${RATE_DEFS.map(([k,l]) => `<span>${esc(l)}</span><span>${r[k] ? eur(r[k]) : '–'}</span>`).join('')}</div>
+    <p class="rules">${esc(S.config.rules ?? DEFAULT_RULES)}</p>
+  </details>`;
+}
+
+function viewAbrechnung(){
+  const a = cur(); const ids = abendMembers(a); const sum = abendSum(a);
+  const rows = ids.map(id => { const p = P(a,id); const c = calc(a,id);
+    return `<tr class="${p.present?'':'absent'}">
+      <td>${esc(memberName(id))}${c.isK?' <span class="crown">♛</span>':''}${p.present?'':' <small>(nicht da)</small>'}</td>
+      <td><label><input type="checkbox" data-act="beitrag" data-id="${id}" ${p.beitrag!==false?'checked':''} aria-label="Monatsbeitrag ${esc(memberName(id))}"> <span class="num">${eur(c.beitrag)}</span></label></td>
+      <td class="num">${eur(c.strafen)}</td>
+      <td class="num"><strong data-out="ges:${id}">${eur(c.gesamt)}</strong></td>
+      <td><input class="inp w num" inputmode="decimal" data-f="bezahlt" data-id="${id}" value="${num(p.bezahlt)||''}" aria-label="Gezahlt ${esc(memberName(id))}"></td>
+      <td class="num" data-out="off:${id}">${offenHtml(c.offen)}</td>
+      <td><div class="acts"><button class="btn small" data-act="paid" data-id="${id}" ${c.offen<=0?'disabled':''}>Alles bezahlt</button><button class="btn small wa" data-act="wa" data-id="${id}" aria-label="Abrechnung für ${esc(memberName(id))} per WhatsApp senden">WhatsApp</button></div></td>
+    </tr>`; }).join('');
+  const pr = present(a);
+  return `${backupBanner()}<section>
+    <h2>Abrechnung ${esc(fmtDate(S.cur))}</h2><p class="sub">Beitrag plus Strafen je Person. Gezahlte Beträge hier abhaken.</p>
+    <div class="row" style="margin-bottom:16px"><button class="btn wa" data-act="waGroup">Übersicht an die Gruppe senden</button></div>
+    <div class="row" style="margin-bottom:16px">
+      <label class="field">Kosten Kegelbahn (€)<input class="num" inputmode="decimal" data-f="bahn" value="${num(a.bahn)||''}" style="width:140px"></label>
+      <label class="field">Pumpenkönig
+        <select data-f="koenig">
+          <option value="auto" ${!a.koenig||a.koenig==='auto'?'selected':''}>Automatisch (meiste Pumpen)</option>
+          <option value="none" ${a.koenig==='none'?'selected':''}>Kein Pumpenkönig</option>
+          ${pr.map(id => `<option value="${id}" ${a.koenig===id?'selected':''}>${esc(memberName(id))}</option>`).join('')}
+        </select></label>
+    </div>
+    <div class="tscroll"><table>
+      <thead><tr><th>Name</th><th>Beitrag</th><th>Strafen</th><th>Gesamt</th><th>Gezahlt</th><th>Offen</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td>Summe</td><td></td><td class="num">${eur(sum.strafen)}</td><td class="num" data-out="sumsoll">${eur(sum.soll)}</td><td class="num" data-out="sumist">${eur(sum.ist)}</td><td class="num" data-out="sumoff">${offenHtml(sum.offen)}</td><td></td></tr></tfoot>
+    </table></div>
+    <p class="note" data-out="saldo">${saldoText(a)}</p>
+    <div class="row"><button class="btn" data-act="csv">Abrechnung als CSV (Excel)</button><button class="btn" data-act="backup">Sicherung speichern</button></div>
+    <p class="note">${backupHint()}</p>
+    <div style="margin-top:28px"><button class="btn danger small" data-act="del">Diesen Abend löschen</button></div>
+  </section>`;
+}
+function offenHtml(v){ return v > 0.004 ? `<span class="pos">${eur(v)}</span>` : v < -0.004 ? `<span>${eur(v)} Guthaben</span>` : `<span class="zero">bezahlt</span>`; }
+function saldoText(a){ const s = abendSum(a); return `Eingenommen ${eur(s.ist)} − Kegelbahn ${eur(s.bahn)} = Saldo des Abends ${eur(s.ist - s.bahn)}`; }
+
+function viewKasse(){
+  const ids = sortedIds(); const start = num(S.config.startKasse);
+  let ist = 0, bahn = 0; const debts = {};
+  ids.forEach(id => { const a = S.abende[id]; const s = abendSum(a); ist += s.ist; bahn += s.bahn;
+    abendMembers(a).forEach(m => { const o = calc(a,m).offen; if(Math.abs(o) > 0.004) debts[m] = (debts[m]||0) + o; }); });
+  const stand = start + ist - bahn;
+  const offen = Object.values(debts).filter(v=>v>0).reduce((s,v)=>s+v,0);
+  const debtRows = Object.entries(debts).filter(([,v]) => Math.abs(v) > 0.004).sort((x,y)=>y[1]-x[1])
+    .map(([m,v]) => `<tr><td>${esc(memberName(m))}</td><td class="num">${offenHtml(v)}</td></tr>`).join('');
+  const evRows = ids.map(id => { const s = abendSum(S.abende[id]);
+    return `<tr><td><button class="btn small" data-act="goto" data-id="${id}">${esc(fmtDate(id))}</button></td><td class="num">${eur(s.soll)}</td><td class="num">${eur(s.ist)}</td><td class="num">${eur(s.bahn)}</td><td class="num">${eur(s.ist - s.bahn)}</td><td class="num">${offenHtml(s.offen)}</td></tr>`; }).join('');
+  return `${backupBanner()}<section class="kasse">
+      <div><div class="lbl">Kassenstand</div><div class="big num">${eur(stand)}</div></div>
+      <div><div class="lbl">Noch ausstehend</div><div class="mid num" style="color:var(--red)">${eur(offen)}</div></div>
+      <div><div class="lbl">Anfangsbestand</div><div class="mid num">${eur(start)}</div></div>
+    </section>
+    <section><h2>Wer schuldet noch was?</h2><p class="sub">Summe über alle Abende.</p>
+      ${debtRows ? `<div class="tscroll"><table><thead><tr><th>Name</th><th>Offen</th></tr></thead><tbody>${debtRows}</tbody></table></div>` : `<div class="panel empty">Alles beglichen.</div>`}
+    </section>
+    <section><h2>Alle Abende</h2>
+      ${evRows ? `<div class="tscroll"><table><thead><tr><th>Abend</th><th>Soll</th><th>Eingenommen</th><th>Kegelbahn</th><th>Saldo</th><th>Offen</th></tr></thead><tbody>${evRows}</tbody></table></div>` : `<div class="panel empty">Noch keine Abende erfasst.</div>`}
+    </section>`;
+}
+
+function viewSettings(){
+  const ms = members(); const r = rates();
+  return `<section><h2>Mitglieder</h2><p class="sub">Inaktive Mitglieder erscheinen nicht mehr bei neuen Abenden, alte Abrechnungen bleiben erhalten.</p>
+    <div class="panel"><div class="mlist">
+      ${ms.map(m => `<div class="mrow ${m.active===false?'inactive':''}">
+        <input type="text" data-f="mname" data-id="${m.id}" value="${esc(m.name)}" aria-label="Name">
+        <button class="btn small" data-act="toggleMember" data-id="${m.id}">${m.active===false?'Aktivieren':'Deaktivieren'}</button>
+      </div>`).join('') || '<p class="note">Noch keine Mitglieder.</p>'}
+    </div>
+    <div class="row" style="margin-top:14px"><label class="field" style="flex:1">Neues Mitglied<input type="text" id="newMember" placeholder="Vorname oder Spitzname"></label><button class="btn primary" data-act="addMember">Hinzufügen</button></div>
+    <p class="note">Datensparsam bleiben: Vorname oder Spitzname reicht völlig.</p></div>
+  </section>
+  <section><h2>Strafsätze und Beitrag</h2><p class="sub">Beträge in Euro. 0 heißt: nicht berechnet.</p>
+    <div class="panel grid2">${RATE_DEFS.map(([k,l]) => `<label class="field">${esc(l)}<input class="num" inputmode="decimal" data-f="rate" data-k="${k}" value="${String(r[k]).replace('.',',')}"></label>`).join('')}</div>
+  </section>
+  <section><h2>Kasse</h2>
+    <div class="panel"><label class="field" style="max-width:240px">Anfangsbestand der Kasse (€)<input class="num" inputmode="decimal" data-f="start" value="${String(num(S.config.startKasse)).replace('.',',')}"></label></div>
+  </section>
+  <section><h2>Regeln</h2>
+    <div class="panel"><label class="field">Vereinsregeln (erscheinen unter „Strafen“)<textarea rows="6" data-f="rules">${esc(S.config.rules ?? DEFAULT_RULES)}</textarea></label></div>
+  </section>
+  <section><h2>Datensicherung</h2>
+    <div class="panel">
+      <p class="sub" style="margin-top:0">Alle Daten liegen nur auf diesem Handy. Speichere nach jedem Abend eine Sicherung, zum Beispiel per Mail oder Messenger an dich selbst. Mit der Sicherung ziehst du auch auf ein neues Handy um.</p>
+      <div class="row"><button class="btn primary" data-act="backup">Sicherung speichern</button>
+      <label class="btn">Sicherung einspielen<input type="file" id="importFile" accept=".json,application/json" hidden></label></div>
+      <p class="note">${backupHint()}</p>
+    </div>
+  </section>
+  <p class="note">Die App funktioniert ohne Internet. Daten werden nicht übertragen, sondern nur auf diesem Gerät gespeichert.</p>`;
+}
+
+/* ---------- Abgeleitete Werte live aktualisieren ---------- */
+function refreshDerived(){
+  const a = cur(); if(!a) return;
+  document.querySelectorAll('[data-out]').forEach(el => {
+    const [k,id] = el.dataset.out.split(':');
+    if(k === 'pts') el.textContent = calc(a,id).punkte;
+    else if(k === 'str') el.textContent = eur(calc(a,id).strafen);
+    else if(k === 'ges') el.textContent = eur(calc(a,id).gesamt);
+    else if(k === 'off') el.innerHTML = offenHtml(calc(a,id).offen);
+    else if(k === 'sumsoll') el.textContent = eur(abendSum(a).soll);
+    else if(k === 'sumist') el.textContent = eur(abendSum(a).ist);
+    else if(k === 'sumoff') el.innerHTML = offenHtml(abendSum(a).offen);
+    else if(k === 'saldo') el.textContent = saldoText(a);
+  });
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if(!t) return;
+  const act = t.dataset.act, id = t.dataset.id, a = cur();
+  switch(act){
+    case 'tab': S.tab = t.dataset.v; S.showNew = false; render(); window.scrollTo(0,0); return;
+    case 'new': S.showNew = true; if(S.tab === 'einstellungen') S.tab = 'spiel'; render(); return;
+    case 'cancelNew': S.showNew = false; render(); return;
+    case 'create': {
+      const d = $('#newDate').value; if(!d) return;
+      if(S.abende[d]){ S.cur = d; S.showNew = false; render(); return; }
+      const ab = { date:d, bahn:0, koenig:'auto', p:{} };
+      members().filter(m => m.active !== false).forEach(m => ab.p[m.id] = blankP(true));
+      S.abende[d] = ab; S.cur = d; S.showNew = false; S.tab = 'spiel'; saveAbend(d); render(); return;
+    }
+    case 'goto': S.cur = id; S.tab = 'abrechnung'; render(); window.scrollTo(0,0); return;
+    case 'sel': S.sel = id; render(); return;
+    case 'present': { const p = P(a,id); p.present = !p.present; saveAbend(S.cur); render(); return; }
+    case 'inc': { const p = P(a,S.sel); const k = t.dataset.k; p[k] = Math.max(0, (p[k]||0) + Number(t.dataset.d)); saveAbend(S.cur); render(); return; }
+    case 'beitrag': { const p = P(a,id); p.beitrag = t.checked; saveAbend(S.cur); render(); return; }
+    case 'paid': { const p = P(a,id); p.bezahlt = Math.round(calc(a,id).gesamt*100)/100; saveAbend(S.cur); render(); return; }
+    case 'del': if(confirm('Abend vom ' + fmtDate(S.cur) + ' mit allen Punkten und Zahlungen löschen?')){ deleteAbend(S.cur); S.cur = null; render(); } return;
+    case 'csv': exportCsv(); return;
+    case 'backup': backup(); return;
+    case 'addGame': {
+      const n = nGames(a); if(n >= MAX_GAMES) return;
+      a.spiele = n + 1; abendMembers(a).forEach(m => P(a,m)); saveAbend(S.cur); render();
+      const inp = document.querySelector(`[data-f="game"][data-i="${n}"]`); if(inp){ inp.scrollIntoView({block:'nearest', inline:'end'}); }
+      return; }
+    case 'removeGame': {
+      const n = nGames(a); if(n <= 1) return;
+      const filled = abendMembers(a).some(m => a.p?.[m]?.games?.[n-1] !== undefined && String(a.p[m].games[n-1]).trim() !== '');
+      if(filled && !confirm('In Spiel ' + n + ' stehen schon Punkte. Trotzdem entfernen?')) return;
+      a.spiele = n - 1; abendMembers(a).forEach(m => P(a,m)); saveAbend(S.cur); render(); return; }
+    case 'wa': sendWhatsApp(personText(cur(), id)); return;
+    case 'waGroup': sendWhatsApp(groupText(cur())); return;
+    case 'initConfig': S.config = { members:[], rates:Object.fromEntries(RATE_DEFS.map(([k,,d])=>[k,d])), startKasse:0, rules:DEFAULT_RULES }; saveConfig(); S.tab = 'einstellungen'; render(); return;
+    case 'addMember': { const inp = $('#newMember'); const n = inp.value.trim(); if(!n) { inp.focus(); return; }
+      S.config.members = [...members(), { id:uid(), name:n, active:true }]; saveConfig(); render(); $('#newMember')?.focus(); return; }
+    case 'toggleMember': { const m = members().find(x => x.id === id); if(m){ m.active = m.active === false; saveConfig(); render(); } return; }
+  }
+});
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.id === 'newMember'){ e.preventDefault(); document.querySelector('[data-act="addMember"]').click(); } });
+
+document.addEventListener('input', e => {
+  const t = e.target; const f = t.dataset?.f; if(!f) return;
+  const a = cur(), id = t.dataset.id;
+  if(f === 'game'){ P(a,id).games[Number(t.dataset.i)] = t.value.replace(/[^\d]/g,''); saveAbend(S.cur); refreshDerived(); }
+  else if(f === 'bezahlt'){ P(a,id).bezahlt = num(t.value); saveAbend(S.cur); refreshDerived(); }
+  else if(f === 'sonst'){ P(a,id).sonst = num(t.value); saveAbend(S.cur); refreshDerived(); }
+  else if(f === 'bahn'){ a.bahn = num(t.value); saveAbend(S.cur); refreshDerived(); }
+  else if(f === 'rate'){ S.config.rates = { ...(S.config.rates||{}), [t.dataset.k]: num(t.value) }; saveConfig(); }
+  else if(f === 'start'){ S.config.startKasse = num(t.value); saveConfig(); }
+  else if(f === 'rules'){ S.config.rules = t.value; saveConfig(); }
+  else if(f === 'mname'){ const m = members().find(x => x.id === id); if(m){ m.name = t.value; saveConfig(); } }
+});
+document.addEventListener('change', e => {
+  const t = e.target; const f = t.dataset?.f;
+  if(f === 'abend'){ S.cur = t.value; S.showNew = false; render(); }
+  else if(f === 'koenig'){ cur().koenig = t.value; saveAbend(S.cur); render(); }
+  else if(['bezahlt','sonst','bahn'].includes(f)){ pendingRender = true; }
+});
+
+async function exportCsv(){
+  const a = cur(); if(!a) return;
+  const head = ['Name','Anwesend',...Array.from({length:nGames(a)},(_,i)=>'Spiel '+(i+1)),'Punkte',...COUNTERS.map(([,l])=>l),'Pumpenkönig','Sonstiges','Beitrag','Strafen','Gesamt','Gezahlt','Offen'];
+  const f2 = n => String(Math.round(n*100)/100).replace('.',',');
+  const q = v => '"' + String(v).replace(/"/g,'""') + '"';
+  const lines = [head.map(q).join(';')];
+  abendMembers(a).forEach(id => { const p = P(a,id), c = calc(a,id);
+    lines.push([memberName(id), p.present?'ja':'nein', ...p.games, c.punkte, ...COUNTERS.map(([k])=>p[k]||0), c.isK?'ja':'', f2(num(p.sonst)), f2(c.beitrag), f2(c.strafen), f2(c.gesamt), f2(c.bezahlt), f2(c.offen)].map(q).join(';')); });
+  const s = abendSum(a);
+  lines.push(''); lines.push([q('Kosten Kegelbahn'), q(f2(s.bahn))].join(';')); lines.push([q('Saldo des Abends'), q(f2(s.ist - s.bahn))].join(';'));
+  await shareOrDownload(new Blob(['\ufeff' + lines.join('\r\n')], {type:'text/csv'}), `Kegelabend_${S.cur}.csv`);
+}
+
+/* ---------- Start ---------- */
+function localLoad(){
+  try{ const d = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if(d){ S.config = d.config || null; S.abende = d.abende || {}; } }catch(e){}
+}
+
+/* ---------- WhatsApp ---------- */
+function personText(a, id){
+  const r = rates(), p = P(a,id), c = calc(a,id);
+  const L = ['Hallo ' + memberName(id) + ', hier deine Kegelkasse vom ' + fmtDate(S.cur) + ':', ''];
+  if(c.beitrag) L.push('Monatsbeitrag: ' + eur(c.beitrag));
+  COUNTERS.forEach(([k,l,rk]) => {
+    const n = p[k] || 0; if(!n) return;
+    const name = k === 'schnaps' ? 'Schnapsrunde' : l;
+    L.push(n + '× ' + name + (rk && r[rk] ? ': ' + eur(n * r[rk]) : ' (nur gezählt)'));
+  });
+  if(c.isK) L.push('Pumpenkönig: ' + eur(r.koenig));
+  if(num(p.sonst)) L.push('Sonstiges: ' + eur(num(p.sonst)));
+  if(p.present && c.punkte) L.push('', 'Deine Punkte: ' + c.punkte + ' Holz');
+  L.push('', '*Gesamt: ' + eur(c.gesamt) + '*');
+  if(c.bezahlt) L.push('Schon gezahlt: ' + eur(c.bezahlt));
+  L.push(c.offen > 0.004 ? '*Noch offen: ' + eur(c.offen) + '*' : 'Alles bezahlt, danke! 🎳');
+  return L.join('\n');
+}
+function groupText(a){
+  const L = ['🎳 Kegelabend ' + fmtDate(S.cur), ''];
+  const pr = present(a);
+  const best = pr.map(id => [id, calc(a,id).punkte]).sort((x,y) => y[1]-x[1]);
+  if(best.length && best[0][1] > 0) L.push('Beste Holz: ' + memberName(best[0][0]) + ' mit ' + best[0][1], '');
+  const K = kings(a); if(K.length) L.push('Pumpenkönig: ' + K.map(memberName).join(', '), '');
+  L.push('Wer zahlt was:');
+  abendMembers(a).forEach(id => { const c = calc(a,id);
+    L.push('• ' + memberName(id) + ': ' + eur(c.gesamt) + (c.offen > 0.004 ? (c.bezahlt ? ' (offen ' + eur(c.offen) + ')' : '') : ' ✓')); });
+  const s = abendSum(a);
+  L.push('', 'Summe: ' + eur(s.soll) + ', davon noch offen: ' + eur(Math.max(0, s.offen)));
+  return L.join('\n');
+}
+function sendWhatsApp(text){
+  window.location.href = 'whatsapp://send?text=' + encodeURIComponent(text);
+}
+
+/* ---------- Sicherung ---------- */
+function needsBackup(){
+  const ch = localStorage.getItem('kegelkasse-letzte-aenderung'); if(!ch) return false;
+  const bk = localStorage.getItem(BK_KEY);
+  return !bk || new Date(ch) > new Date(bk);
+}
+function backupBanner(){
+  if(!needsBackup()) return '';
+  return `<div class="banner" role="status"><span><strong>Neue Einträge seit der letzten Sicherung.</strong> ${esc(backupHint())}</span><button class="btn primary small" data-act="backup">Jetzt sichern</button></div>`;
+}
+function backupHint(){
+  const t = localStorage.getItem(BK_KEY);
+  if(!t) return 'Noch keine Sicherung gespeichert.';
+  const d = new Date(t);
+  return 'Letzte Sicherung: ' + d.toLocaleDateString('de-DE') + ', ' + d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) + ' Uhr';
+}
+async function shareOrDownload(blob, filename){
+  try{
+    const file = new File([blob], filename, {type: blob.type});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:filename});
+      return true;
+    }
+  }catch(e){ if(e && e.name === 'AbortError') return false; }
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = u; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 5000);
+  return true;
+}
+async function backup(){
+  const data = { app:'kegelkasse', version:1, erstellt:new Date().toISOString(), config:S.config, abende:S.abende };
+  const ok = await shareOrDownload(new Blob([JSON.stringify(data, null, 1)], {type:'application/json'}), 'Kegelkasse_Sicherung_' + iso(new Date()) + '.json');
+  if(ok){ try{ localStorage.setItem(BK_KEY, new Date().toISOString()); }catch(e){} render(); }
+}
+document.addEventListener('change', e => {
+  if(e.target.id !== 'importFile') return;
+  const file = e.target.files && e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(d.app !== 'kegelkasse' || !d.config || typeof d.abende !== 'object') throw new Error('format');
+      const n = Object.keys(d.abende).length;
+      if(!confirm('Sicherung mit ' + n + ' Abend(en) einspielen? Die Daten auf diesem Handy werden dabei ersetzt.')) return;
+      S.config = d.config; S.abende = d.abende; S.cur = null; S.sel = null;
+      localSave(); setStatus('ok'); S.tab = 'kasse'; render();
+    }catch(err){ setStatus('err', 'Diese Datei ist keine gültige Kegelkasse-Sicherung.'); }
+  };
+  r.onerror = () => setStatus('err', 'Datei konnte nicht gelesen werden.');
+  r.readAsText(file);
+});
+
+mode = 'local'; localLoad(); setStatus('ok'); render();
+if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
